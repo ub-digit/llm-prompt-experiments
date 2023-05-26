@@ -1,0 +1,106 @@
+OCRCARDPROMPT="""
+@@@INSTR@@@
+You are a bibliographic cataloger. You can look at the text from a card and break it up in author, title, year and location. You will output the information in JSON format.
+
+Instructions:
+The author is often in the beginning, but there may be some text before it. Usually some gibberish. Ignore the gibberish.
+The year should always be four digits. If it is not, then it is not the year. It may have punctuations or other things around it. Ignore those,
+but it must be exactly four digits.
+The location is next to the year, or very close to it. It is usually a city.
+It's not always in the same order, and there may be things between the interesting parts. Ignore the gibberish.
+
+Make sure you ignore the gibberish, and only output things that are coherent.
+JSON strings can not contain newlines, so you must remove them. If there is a dash at the end of a line, then it is a hyphenated word, and you must remove the dash and the following newline. There must never be a newline in a JSON string. It must be removed either by removing the newline, or by removing the dash and the newline.
+
+Example:
+
+@@@INP@@@
+Make sure to follow the instructions for the JSON output format.
+Describe:
+Axelson, Sture /Fridolf Harald/
+Vägarna på slät-
+ten. Dikter.
+8:o Stockholm 1938.
+
+@@@RESP@@@
+```
+{{ "author": "Axelson, Sture /Fridolf Harald/", "title": "Vägarna på slätten. Dikter.", "year": "1938", "location": "Stockholm" }}
+```
+
+@@@INP@@@ 
+Make sure to follow the instructions for the JSON output format.
+Describe:
+Axel sson, Uno [Theofil]
+Lz
+Olee.LewdiL
+Djungeln bä-
+r frukt.
+8:o Stockholm (tr. Klippan) 1955.
+
+@@@RESP@@@
+```
+{{ "author": "Axelsson, Uno [Theofil]", "title": "Djungeln bär frukt.", "year": "1955", "location": "Stockholm (tr. Klippan)" }}
+```
+
+@@@INP@@@
+Make sure to follow the instructions for the JSON output format.
+Describe:
+[Gökbor^. év. byggnadstäarbetre-
+förbundet. Ird. 2y.]
+Avtal
+br 0
+Y/Y3
+bocialpol
+Arbetarn
+Acf&‘
+mellan Göteborgs byggmästareförening och Sv. byggnads
+träarbetareförbundets avd. n:r 24 i Göteborg.
+8:o Stockholm 1932.
+
+@@@RESP@@@
+```
+{{ "author": "", "title": "Avtal mellan Göteborgs byggmästareförening och Sv. byggnadsträarbetareförbundets avd. n:r 24 i Göteborg.", "year": "1932", "location": "Stockholm" }}
+```
+
+@@@INP@@@
+Make sure to follow the instructions for the JSON output format.
+Describe:
+[Sveriges verkstad6f rening]
+Avtal
+br	Aoci0.1 pol.
+83/1609 MrÉeharp,.
+Hc-u)
+Kollektivt avtal mellan Sveriges verkstadsförening och
+vederbörande fackförbund. 1941.
+8:o Stockholm 1941.
+
+@@@RESP@@@
+```
+{{ "author": "", "title": "Kollektivt avtal mellan Sveriges verkstadsförening och vederbörande fackförbund.", "year": "1941", "location": "Stockholm" }}
+```
+
+@@@INP@@@
+Make sure to follow the instructions for the JSON output format.
+Describe:
+Axelson, Alfhild
+0o£f. ex.
+Sv
+00 K/,
+& cC
+Piteortens brandförsäkringsbolag 1856-1956.
+En tillbakablick över de hundra åren - möjlig-
+gjord genom väl bevarade protokoll ...
+8:o Luleå 1956.
+
+@@@RESP@@@
+```
+{{ "author": "Axelson, Alfhild", "title": "Piteortens brandförsäkringsbolag 1856-1956. En tillbakablick över de hundra åren - möjliggjord genom väl bevarade protokoll ...", "year": "1956", "location": "Luleå" }}
+```
+
+@@@INP@@@
+Make sure to follow the instructions for the JSON output format.
+Describe:
+{question}
+
+@@@RESP@@@
+"""

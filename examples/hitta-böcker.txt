@@ -1,0 +1,34 @@
+# Böcker
+Du hittar universitetsbibliotekets böcker i Supersök. Äldre böcker kan du behöva söka efter i våra inskannade och tryckta kortkataloger.
+
+## Hitta böcker i Supersök
+Använd Supersök för att hitta böcker. I Supersök kan du söka efter merparten av det tryckta material som köpts in av Göteborgs universitetsbibliotek efter år 1957. Filtrera på Böcker för att avgränsa din sökning.
+
+### Hitta kursböcker
+Du hittar även kursböcker i Supersök. Filtrera på Kursbok för att snabbt få träffar på endast kursböcker.
+När du hittat en tillgänglig kursbok hämtar du den själv från bibliotekets kursbokshylla. Kursböckerna står uppställda i alfabetisk ordning, sorterade på boktitel. Om kursboken är utlånad kan du ställa dig på kö.
+
+### Hitta e-böcker
+Använd Supersök för att hitta e-böcker. Du kan söka på ämne, författare, boktitel eller kapiteltitel, och ibland ord ur hela innehållet i e-boken. Filtrera på Böcker och Fulltext online för att begränsa ditt sökresultat till e-böcker.
+Reglerna för hur länge du får låna och hur du får använda e-böcker kan skilja sig åt beroende på bok och förlag.
+
+## När du har hittat boken och vill låna den
+När du hittat en bok i Supersök kan du se var den är placerad och ofta själv hämta boken direkt från hyllan.
+Om boken finns i bibliotekens magasin måste du först beställa fram den för att kunna låna. Om boken är utlånad kan du ställa dig i kö.
+
+## Hitta äldre böcker i kortkataloger
+Om du letar efter äldre böcker och inte hittar dem i Supersök kan du istället använda någon av våra kortkataloger.
+
+## Hitta talböcker i Legimus
+En talbok är en inläst version av en tryckt bok. Observera att endast du som har behov av läs- och skrivstöd har rätt att låna talböcker. Du hittar talböcker i katalogen Legimus och läser dem i din dator, telefon eller i särskilda spelare.
+
+## Om vi inte har boken du behöver
+Om Göteborgs universitetsbibliotek inte har den bok du behöver kan du söka efter boken i den nationella katalogen Libris. I Libris kan du hitta uppgifter om vad som finns att låna på alla universitets- och högskolebibliotek och flera forskningsbibliotek i Sverige.
+
+Om boken inte finns i Sverige kan du fortsätta din sökning i utländska bibliotekskataloger för att se om materialet finns på andra håll i världen.
+
+### Beställa fjärrlån
+Om du vill att vi lånar in boken åt dig från något annat bibliotek kan du beställa ett fjärrlån. Det brukar ta runt en vecka att få den beställda boken. Observera att endast tryckta böcker är möjliga att fjärrlåna.
+
+### Föreslå inköp
+Du kan föreslå att Göteborgs universitetsbibliotek köper in den bok du behöver. E-böcker går ofta snabbt beställa in, medan det kan dröja tre veckor innan en inköpt tryckt bok blir tillgänglig för dig att låna.
