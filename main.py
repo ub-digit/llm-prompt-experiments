@@ -27,7 +27,10 @@ def fetch_table_from_url_data(soup):
         if len(table) == 0:
             # Return the text content of the page if the table is not found
             return None
-        input = str(table[0])
+        if OPTIONS["textonly"] == True:
+            input = table[0].get_text("   ").strip()
+        else:
+            input = str(table[0])
     else:
         # Get the text content of the largest table on the page
         tables = soup.find_all("table")
@@ -37,7 +40,10 @@ def fetch_table_from_url_data(soup):
         input = tables[0].get_text().strip()
         for table in tables:
             if len(table.get_text().strip()) > len(input):
-                input = str(table)
+                if OPTIONS["textonly"] == True:
+                    input = table.get_text("   ").strip()
+                else:
+                    input = str(table)
     return input
 
 # Same as fetch_table_from_url_data except for lists (ul and ol)
@@ -47,7 +53,10 @@ def fetch_list_from_url_data(soup):
         if len(list) == 0:
             # Return the text content of the page if the list is not found
             return None
-        input = str(list[0])
+        if OPTIONS["textonly"] == True:
+            input = list[0].get_text("   ").strip()
+        else:
+            input = str(list[0])
     else:
         # Get the text content of the largest list on the page
         lists = soup.find_all(["ul", "ol"])
@@ -57,7 +66,10 @@ def fetch_list_from_url_data(soup):
         input = lists[0].get_text().strip()
         for list in lists:
             if len(list.get_text().strip()) > len(input):
-                input = str(list)
+                if OPTIONS["textonly"] == True:
+                    input = list.get_text("   ").strip()
+                else:
+                    input = str(list)
     return input
 
 # Use requests and beautifulsoup to fetch the input from the text content of a URL
@@ -85,12 +97,11 @@ def fetch_input_from_url(url):
     return input
 
 # Parse options parameter from the command line
-# It has the format "key1=value1,key2,key3=value3" where it is true if there is no value
+# If is an array of options. Each option is a string in the format "key=value" or just "key" in which case the value is True
 def parse_options(options):
     global OPTIONS
     if options is None:
         return
-    options = options.split(",")
     for option in options:
         if "=" in option:
             key, value = option.split("=")
@@ -148,8 +159,8 @@ def main():
     parser.add_argument('-j', '--json', type=str, help='Output JSON', required=False)
     # fetch input from url with -u
     parser.add_argument('-u', '--url', type=str, help='Fetch input from URL (cannot be used together with inputfile)', required=False)
-    # special options with -O
-    parser.add_argument('-O', '--options', type=str, help='Special options', required=False)
+    # special options with -O and it should be repeated for each option
+    parser.add_argument('-O', '--option', type=str, help='Special option', required=False, action='append')
     # input from command line
     parser.add_argument('input', type=str, nargs='*', help='Input')
 
@@ -182,8 +193,8 @@ def main():
         outputfile = args.outputfile
     if args.verbose != None:
         DEBUG = args.verbose
-    if args.options != None:
-        parse_options(args.options)
+    if args.option != None:
+        parse_options(args.option)
     if args.json != None:
         outputjson = args.json
     if args.inputfile != None:
