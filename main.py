@@ -110,9 +110,9 @@ def parse_options(options):
             OPTIONS[option] = True
 
 def run(prompttype, input, llm):
-    debug("\n---------  QUESTION  ---------\n")
+    debug("\n---------  INPUT  ---------\n")
     debug(input)
-    debug("\n-------- END QUESTION --------\n")
+    debug("\n-------- END INPUT --------\n")
     prompttext = pr.get_prompt(prompttype)
     prompt = PromptTemplate.from_template(prompttext)
     llmchain = LLMChain(prompt=prompt, llm=llm)
