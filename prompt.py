@@ -1,14 +1,3 @@
-from prompts.ullist import ULLISTPROMPT
-from prompts.ollist import OLLISTPROMPT
-from prompts.jsonobject import JSONOBJECTPROMPT
-from prompts.jsonarray import JSONARRAYPROMPT
-from prompts.ocrcard import OCRCARDPROMPT
-from prompts.jsontoxml import JSONTOXMLPROMPT
-from prompts.jsonrepair import JSONREPAIRPROMPT
-from prompts.translatese2en import TRANSLATESE2ENPROMPT
-from prompts.translateen2se import TRANSLATEEN2SEPROMPT
-from prompts.summarize import SUMMARIZEPROMPT
-from prompts.bullets import BULLETSPROMPT
 import yaml
 import os
 
@@ -32,20 +21,6 @@ STYLES={
 }
 
 PROMPTS={}
-
-# PROMPTS={
-#     "ullist": { "prompt": ULLISTPROMPT, "has_json_result": False, "requires_file": False },
-#     "ollist": { "prompt": OLLISTPROMPT, "has_json_result": False, "requires_file": False },
-#     "jsonobject": { "prompt": JSONOBJECTPROMPT, "has_json_result": True, "requires_file": False },
-#     "jsonarray": { "prompt": JSONARRAYPROMPT, "has_json_result": True, "requires_file": False },
-#     "ocrcard": { "prompt": OCRCARDPROMPT, "has_json_result": True, "requires_file": True },
-#     "jsontoxml": { "prompt": JSONTOXMLPROMPT, "has_json_result": False, "requires_file": True },
-#     "jsonrepair": { "prompt": JSONREPAIRPROMPT, "has_json_result": True, "requires_file": True },
-#     "translatese2en": { "prompt": TRANSLATESE2ENPROMPT, "has_json_result": False, "requires_file": False },
-#     "translateen2se": { "prompt": TRANSLATEEN2SEPROMPT, "has_json_result": False, "requires_file": False },
-#     "summarize": { "prompt": SUMMARIZEPROMPT, "has_json_result": False, "requires_file": True },
-#     "bullets": { "prompt": BULLETSPROMPT, "has_json_result": False, "requires_file": True }
-# }
 
 # Convert prompts to yaml with properties name, description, has_json_result, requires_file, and prompt.
 # Prompt should be last so that it can be a multiline string.
