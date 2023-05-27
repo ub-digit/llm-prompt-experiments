@@ -15,21 +15,88 @@ dotenv.load_dotenv()
 MODEL_TYPE="wizard-vicuna"
 DEBUG=False
 PRINTRESULT=False
+OPTIONS={}
 
 def debug(msg):
     if DEBUG:
         print(msg)
 
+def fetch_table_from_url_data(soup):
+    if OPTIONS["table"] != True:
+        table = soup.select(OPTIONS["table"])
+        if len(table) == 0:
+            # Return the text content of the page if the table is not found
+            return None
+        input = str(table[0])
+    else:
+        # Get the text content of the largest table on the page
+        tables = soup.find_all("table")
+        if len(tables) == 0:
+            # Return the text content of the page if there are no tables
+            return soup.get_text().strip()
+        input = tables[0].get_text().strip()
+        for table in tables:
+            if len(table.get_text().strip()) > len(input):
+                input = str(table)
+    return input
+
+# Same as fetch_table_from_url_data except for lists (ul and ol)
+def fetch_list_from_url_data(soup):
+    if OPTIONS["list"] != True:
+        list = soup.select(OPTIONS["list"])
+        if len(list) == 0:
+            # Return the text content of the page if the list is not found
+            return None
+        input = str(list[0])
+    else:
+        # Get the text content of the largest list on the page
+        lists = soup.find_all(["ul", "ol"])
+        if len(lists) == 0:
+            # Return the text content of the page if there are no lists
+            return soup.get_text().strip()
+        input = lists[0].get_text().strip()
+        for list in lists:
+            if len(list.get_text().strip()) > len(input):
+                input = str(list)
+    return input
+
 # Use requests and beautifulsoup to fetch the input from the text content of a URL
 def fetch_input_from_url(url):
     r = requests.get(url)
     soup = BeautifulSoup(r.text, "html.parser")
-    # Get the text content of the page
-    input = soup.get_text().strip()
-    # If the text content is empty, raise an exception
-    if input == "":
-        raise Exception("The text content of the URL is empty")
+    # There is an option "table"
+    # If the option "table" is True, get the text content of the largest table on the page
+    # If the option "table" has a CSS selector, get the text content of the table that matches the CSS selector
+    # If the option "table" is False or not set, get the text content of the page
+    if "table" in OPTIONS:
+        input = fetch_table_from_url_data(soup)
+        if input is None:
+            return soup.get_text().strip()
+    elif "list" in OPTIONS:
+        input = fetch_list_from_url_data(soup)
+        if input is None:
+            return soup.get_text().strip()
+    else:
+        # Get the text content of the page
+        input = soup.get_text().strip()
+        # If the text content is empty, raise an exception
+        if input == "":
+            raise Exception("The text content of the URL is empty")
     return input
+
+# Parse options parameter from the command line
+# It has the format "key1=value1,key2,key3=value3" where it is true if there is no value
+def parse_options(options):
+    global OPTIONS
+    if options is None:
+        return
+    options = options.split(",")
+    for option in options:
+        if "=" in option:
+            key, value = option.split("=")
+            OPTIONS[key] = value
+        else:
+            OPTIONS[option] = True
 
 def run(prompttype, input, llm):
     debug("\n---------  QUESTION  ---------\n")
@@ -55,6 +122,7 @@ def main():
     global MODEL_TYPE
     global DEBUG
     global PRINTRESULT
+    global OPTIONS
     outputfile = None
     outputjson = None
     inputfile = None
@@ -80,6 +148,8 @@ def main():
     parser.add_argument('-j', '--json', type=str, help='Output JSON', required=False)
     # fetch input from url with -u
     parser.add_argument('-u', '--url', type=str, help='Fetch input from URL (cannot be used together with inputfile)', required=False)
+    # special options with -O
+    parser.add_argument('-O', '--options', type=str, help='Special options', required=False)
     # input from command line
     parser.add_argument('input', type=str, nargs='*', help='Input')
 
@@ -112,6 +182,8 @@ def main():
         outputfile = args.outputfile
     if args.verbose != None:
         DEBUG = args.verbose
+    if args.options != None:
+        parse_options(args.options)
     if args.json != None:
         outputjson = args.json
     if args.inputfile != None:

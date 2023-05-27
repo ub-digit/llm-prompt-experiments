@@ -49,8 +49,9 @@ prompt: |
   ```
   
   @@@INP@@@
-  Question: {input}
   Note: Remember to use the correct JSON output format.
+  Question:
+  {input}
   
   @@@RESP@@@
   

@@ -9,8 +9,9 @@ prompt: |
   Example:
   
   @@@INP@@@
-  Question: What are the names of the planets in the solar system and their distance from the sun in AU?
   Note: Remember to use the correct JSON output format.
+  Question:
+  What are the names of the planets in the solar system and their distance from the sun in AU?
   
   @@@RESP@@@
   ```
@@ -27,8 +28,9 @@ prompt: |
   ```
   
   @@@INP@@@
-  Question: Which are the three largest cities in Sweden and their population and area?
   Note: Remember to use the correct JSON output format.
+  Question:
+  Which are the three largest cities in Sweden and their population and area?
   
   @@@RESP@@@
   ```
@@ -40,8 +42,9 @@ prompt: |
   ```
   
   @@@INP@@@
-  Question: {input}
   Note: Remember to use the correct JSON output format.
+  Question:
+  {input}
   
   @@@RESP@@@
   
