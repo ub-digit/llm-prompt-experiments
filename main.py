@@ -4,10 +4,13 @@ import prompt as pr
 from langchain import PromptTemplate, LLMChain
 from flexible_json_parser import find_all_json
 import json
-# Handle cmd line arguments
 import argparse
 import requests
+import os
+import dotenv
 from bs4 import BeautifulSoup
+
+dotenv.load_dotenv()
 
 MODEL_TYPE="wizard-vicuna"
 DEBUG=False
@@ -58,8 +61,9 @@ def main():
     verbose = False
     jsonoutput = False
     input = None
-    # llm = TextGenerationWebui(url="http://10.17.42.167:5000/api/v1", verbose=True, temperature = 0.2, max_new_tokens=1000, early_stopping = True, stopping_strings = ["\n###"])
-    llm = OpenAI(openai_api_base="http://10.17.42.167:5001/", openai_api_key="whatever", temperature=0.2, max_tokens=1000)
+    openai_api_base = os.getenv("OPENAI_API_BASE", "http://localhost:5001/")
+    openai_api_key = os.getenv("OPENAI_API_KEY", "change-me-if-necessary")
+    llm = OpenAI(openai_api_base=openai_api_base, openai_api_key=openai_api_key, temperature=0.2, max_tokens=1000)
 
     parser = argparse.ArgumentParser(description='Run a prompt')
     # prompttype from -p
