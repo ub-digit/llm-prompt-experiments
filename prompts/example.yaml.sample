@@ -1,0 +1,14 @@
+name: Prompt name used with -p
+description: Short description, seen when LIST:ing prompts
+has_json_result: True/False - If json output file can be used
+requires_file: True/False - Input cannot come from command line, but must come from input file or url
+prompt: |  
+  @@@INSTR@@@
+  The instruction for using the prompt. Any curly brackets must be escaped by double {{ like this }}
+
+  @@@INP@@@
+  The part where input goes along with some bits of separators or minor instructions.
+  Input is inserted using {input}.
+
+  @@@RESP@@@
+  The last part where the LLM will continue filling in tokens.

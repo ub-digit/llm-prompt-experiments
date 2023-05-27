@@ -17,26 +17,26 @@ def debug(msg):
     if DEBUG:
         print(msg)
 
-# Use requests and beautifulsoup to fetch the question from the text content of a URL
-def fetch_question_from_url(url):
+# Use requests and beautifulsoup to fetch the input from the text content of a URL
+def fetch_input_from_url(url):
     r = requests.get(url)
     soup = BeautifulSoup(r.text, "html.parser")
     # Get the text content of the page
-    question = soup.get_text().strip()
+    input = soup.get_text().strip()
     # If the text content is empty, raise an exception
-    if question == "":
+    if input == "":
         raise Exception("The text content of the URL is empty")
-    return question
+    return input
 
-def run(prompttype, question, llm):
+def run(prompttype, input, llm):
     debug("\n---------  QUESTION  ---------\n")
-    debug(question)
+    debug(input)
     debug("\n-------- END QUESTION --------\n")
     prompttext = pr.get_prompt(prompttype)
     prompt = PromptTemplate.from_template(prompttext)
     llmchain = LLMChain(prompt=prompt, llm=llm)
     debug("\n---------  RESULT  ---------\n")
-    result = llmchain.run({"question": question})
+    result = llmchain.run({"input": input})
     result = result.strip()
     # Remove "###" from the end of the result if it's there
     if result.endswith("###"):
@@ -54,18 +54,18 @@ def main():
     global PRINTRESULT
     outputfile = None
     outputjson = None
-    questionfile = None
+    inputfile = None
     verbose = False
     jsonoutput = False
-    question = None
+    input = None
     # llm = TextGenerationWebui(url="http://10.17.42.167:5000/api/v1", verbose=True, temperature = 0.2, max_new_tokens=1000, early_stopping = True, stopping_strings = ["\n###"])
     llm = OpenAI(openai_api_base="http://10.17.42.167:5001/", openai_api_key="whatever", temperature=0.2, max_tokens=1000)
 
     parser = argparse.ArgumentParser(description='Run a prompt')
     # prompttype from -p
     parser.add_argument('-p', '--prompttype', type=str, help='Prompt type (use LIST to see available prompttypes)', required=True)
-    # question from file using -f
-    parser.add_argument('-f', '--questionfile', type=str, help='Question from file (cannot be used together with URL)', required=False)
+    # input from file using -f
+    parser.add_argument('-f', '--inputfile', type=str, help='Input from file (cannot be used together with URL)', required=False)
     # output file using -o
     parser.add_argument('-o', '--outputfile', type=str, help='Output file', required=False)
     # model type from -m
@@ -74,22 +74,23 @@ def main():
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose', required=False)
     # output JSON using -j
     parser.add_argument('-j', '--json', type=str, help='Output JSON', required=False)
-    # fetch question from url with -u
-    parser.add_argument('-u', '--url', type=str, help='Fetch question from URL (cannot be used together with questionfile)', required=False)
-    # question from command line
-    parser.add_argument('question', type=str, nargs='*', help='Question')
+    # fetch input from url with -u
+    parser.add_argument('-u', '--url', type=str, help='Fetch input from URL (cannot be used together with inputfile)', required=False)
+    # input from command line
+    parser.add_argument('input', type=str, nargs='*', help='Input')
 
     args = parser.parse_args()
 
-    # You cannot have both a question file and a question url
-    if args.questionfile != None and args.url != None:
-        parser.error("You cannot have both a question file and a question URL")
+    # You cannot have both an input file and an input url
+    if args.inputfile != None and args.url != None:
+        parser.error("You cannot have both an input file and an input URL")
 
     # If prompttype is LIST, list all prompttypes
     if args.prompttype == "LIST":
         print("Available prompttypes:")
         for prompttype in pr.get_prompttype_list():
-            print(prompttype)
+            # prompttype is a dict with keys "name" and "description"
+            print(prompttype["name"] + ": " + prompttype["description"])
         sys.exit(0)
 
     # If modeltype is LIST, list all modeltypes
@@ -109,20 +110,20 @@ def main():
         DEBUG = args.verbose
     if args.json != None:
         outputjson = args.json
-    if args.questionfile != None:
-        with open(args.questionfile, "r") as f:
-            question = f.read()
+    if args.inputfile != None:
+        with open(args.inputfile, "r") as f:
+            input = f.read()
     elif args.url != None:
-        question = fetch_question_from_url(args.url)
+        input = fetch_input_from_url(args.url)
     else:
-        question = " ".join(args.question)
+        input = " ".join(args.input)
 
     # If no outputfile or outputjson is specified, print result
     if outputfile == None and outputjson == None:
         PRINTRESULT = True
 
-    if pr.requires_file_input(prompttype) and args.questionfile == None and args.url == None:
-        parser.error("Prompt type {} requires a question file or url".format(prompttype))
+    if pr.requires_file_input(prompttype) and args.inputfile == None and args.url == None:
+        parser.error("Prompt type {} requires an input file or url".format(prompttype))
 
     # If prompttype does not have a JSON result, outputjson is invalid
     if not pr.has_json_result(prompttype) and outputjson:
@@ -130,7 +131,7 @@ def main():
 
     pr.set_style(MODEL_TYPE)
 
-    result = run(prompttype, question, llm)
+    result = run(prompttype, input, llm)
     # If outputfile is specified, write result to file
     if outputfile != None:
         with open(outputfile, "w") as f:
@@ -144,5 +145,10 @@ def main():
             with open(outputjson, "w") as f:
                 json.dump(jsonresult[0], f, indent=4)
 
+def init():
+    pr.load_all_prompts_from_yaml()
+
 if __name__ == "__main__":
+    init()
     main()
+    # pr.convert_all_prompts_to_yaml()

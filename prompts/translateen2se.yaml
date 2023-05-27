@@ -1,0 +1,15 @@
+name: translateen2se
+description: Translate the input from english to swedish.
+has_json_result: False
+requires_file: False
+prompt: |
+  
+  @@@INSTR@@@
+  You are a translation service from english to swedish. Every input is in english and every output is in swedish.
+  
+  @@@INP@@@
+  Translate from english to swedish: {input}
+  
+  @@@RESP@@@
+  
+  
