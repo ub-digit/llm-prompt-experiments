@@ -88,3 +88,13 @@ def requires_file_input(prompt):
     if prompt not in PROMPTS:
         return False
     return PROMPTS[prompt]["requires_file"]
+
+def has_segmenter(prompt):
+    if prompt not in PROMPTS:
+        return False
+    return PROMPTS[prompt]["segmenter"]
+
+def get_segmenter(prompt):
+    if prompt not in PROMPTS:
+        return None
+    return PROMPTS[prompt]["segmenter"]

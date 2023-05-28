@@ -16,6 +16,13 @@ MODEL_TYPE="wizard-vicuna"
 DEBUG=False
 PRINTRESULT=False
 OPTIONS={}
+OPTION_TYPES={
+    "table": str,
+    "list": str,
+    "textonly": bool,
+    "segment": int,
+    "_default": str
+}
 
 def debug(msg):
     if DEBUG:
@@ -105,11 +112,22 @@ def parse_options(options):
     for option in options:
         if "=" in option:
             key, value = option.split("=")
-            OPTIONS[key] = value
+            # Convert the value to the type specified in OPTION_TYPES
+            if key in OPTION_TYPES:
+                OPTIONS[key] = OPTION_TYPES[key](value)
+            else:
+                OPTIONS[key] = value
         else:
             OPTIONS[option] = True
 
 def run(prompttype, input, llm):
+    # If the option "segment" is set, run the input through the segmenter path instead of the normal path
+    if "segment" in OPTIONS and pr.has_segmenter(prompttype):
+        return run_segment(prompttype, input, llm)
+    else:
+        return run_normal(prompttype, input, llm)
+
+def run_normal(prompttype, input, llm, print_result=True):
     debug("\n---------  INPUT  ---------\n")
     debug(input)
     debug("\n-------- END INPUT --------\n")
@@ -122,12 +140,53 @@ def run(prompttype, input, llm):
     # Remove "###" from the end of the result if it's there
     if result.endswith("###"):
         result = result[:-3]
-    if PRINTRESULT:
+    if PRINTRESULT and print_result:
         print(result)
     else:
         debug(result)
     debug("\n-------- END RESULT --------\n")
     return result
+
+# In the segmenter path, the input is split into segments of the size specified by the option "segment"
+# Each segment is run through the segmenter prompt specified by the top-level prompttype
+# The result of each segment is concatenated together and the process is repeated until
+# The entire input is small enough to be run through the normal path
+# If the input is already small enough to be run through the normal path, the normal path is used immediately.
+# The segments should preferably be split at sentence boundaries, and if that is not possible, at word boundaries.
+def run_segment(prompttype, input, llm):
+    segment_length = OPTIONS["segment"]
+    if segment_length == True:
+        segment_length = 2000
+    if len(input) <= segment_length:
+        debug("Input is small enough to run through the normal path: " + str(len(input)) + " <= " + str(segment_length) + " characters")
+        return run_normal(prompttype, input, llm, print_result=True)
+    debug("Input is too large to run through the normal path: " + str(len(input)) + " > " + str(segment_length) + " characters")
+    segments = []
+    # Split the input into segments of the specified length
+    while len(input) > segment_length:
+        # Find the last space in the segment
+        last_space = input[:segment_length].rfind(" ")
+        if last_space == -1:
+            # If there is no space in the segment, split at the specified length
+            last_space = segment_length
+        segments.append(input[:last_space])
+        input = input[last_space:]
+    segments.append(input)
+    segmenter_prompttype = pr.get_segmenter(prompttype)
+    # Now run each segment through the segmenter prompt
+    result = []
+    # Enumerate the segments so that we can print the segment number
+    for i, segment in enumerate(segments):
+        print("\n---------  SEGMENT " + str(i) + "  ---------\n")
+        segment_result = run_normal(segmenter_prompttype, segment, llm, print_result=False)
+        # If segment_result is too short, it means that the segmenter prompt probably wasn't useful, so append the full segment instead
+        if len(segment_result) < len(segment)*0.1:
+            debug("Segment result is too short: " + str(len(segment_result)) + " < " + str(len(segment)*0.1) + " characters")
+            segment_result = segment
+        result.append(segment_result)
+    segment_sum = "\n".join(result)
+    # Now run the segment sum through the original run function
+    return run(prompttype, segment_sum, llm)
 
 def main():
     global MODEL_TYPE
