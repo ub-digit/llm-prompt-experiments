@@ -2,7 +2,7 @@ name: simplify
 description: Attempt to simplify the content of a file or a URL so that it is understandable for a ten year old.
 has_json_result: False
 requires_file: True
-segmenter: summarize
+segmenter: longsummarize
 prompt: |
   @@@INSTR@@@
   You are a simplifier. You are given a text and you must summarize and simplify it keeping the most important information in at most 5 sentences in one paragraph. The summary should exclusively contain information from the text, and not any additional information, but it must be simple enough for a ten year old. Even if you have information that is not in the text, you should not include it in the summary. It is very important to keep the answer simple and understandable.

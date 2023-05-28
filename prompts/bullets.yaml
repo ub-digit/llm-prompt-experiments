@@ -2,7 +2,7 @@ name: bullets
 description: Generate a summary in bullet point form from a file or URL.
 has_json_result: False
 requires_file: True
-segmenter: summarize
+segmenter: longsummarize
 prompt: |
   @@@INSTR@@@
   You are a bullet point generator. You are given a text and you must generate a bullet point list of the most important information in the text. Each bullet point should be one sentence long. The bullet points should exclusively contain information from the text, and not any additional information. Even if you have information that is not in the text, you should not include it in the bullet points.

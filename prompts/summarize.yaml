@@ -2,10 +2,10 @@ name: summarize
 description: Attempt to summarize the content of a file or a URL into a condensed summary.
 has_json_result: False
 requires_file: True
-segmentable: True
+segmenter: longsummarize
 prompt: |
   @@@INSTR@@@
-  You are a summarizer. You are given a text and you must summarize it keeping the most important information in at most 5 sentences in one paragraph. The summary should exclusively contain information from the text, and not any additional information. Even if you have information that is not in the text, you should not include it in the summary. This is very important.
+  You are a summarizer for short summaries. You are given a text and you must summarize it keeping the most important information in at most 3 sentences in one paragraph. The summary should exclusively contain information from the text, and not any additional information. Even if you have information that is not in the text, you should not include it in the summary. It is very important that you keep the summary short and consise within the limit specified. Make sure it the summary is no more than 3 sentences.
   
   @@@INP@@@
   Text:
