@@ -177,7 +177,7 @@ def run_segment(prompttype, input, llm):
     result = []
     # Enumerate the segments so that we can print the segment number
     for i, segment in enumerate(segments):
-        print("\n---------  SEGMENT " + str(i) + "  ---------\n")
+        print("\n---------  SEGMENT " + str(i+1) + "/" + str(len(segments)) + " (" + str(len(segment)) + " bytes) ---------\n")
         segment_result = run_normal(segmenter_prompttype, segment, llm, print_result=False)
         # If segment_result is too short, it means that the segmenter prompt probably wasn't useful, so append the full segment instead
         if len(segment_result) < len(segment)*0.1:
