@@ -169,9 +169,23 @@ def run_segment(prompttype, input, llm):
         if last_space == -1:
             # If there is no space in the segment, split at the specified length
             last_space = segment_length
-        segments.append(input[:last_space])
+        last_segment = input[:last_space]
+        # If the remaining input is smaller than a fifth of the segment length, append it to the last segment
+        if len(input[last_space:]) < segment_length*0.2:
+            debug("Remaining input is too small: " + str(len(input[last_space:])) + " < " + str(segment_length*0.2) + " characters")
+            last_segment += input[last_space:]
+            last_space = len(input)
+        if len(last_segment) > 0:
+            segments.append(last_segment)
         input = input[last_space:]
-    segments.append(input)
+    if len(input) > 0:
+        segments.append(input)
+
+    # If there is only one segment, run it through the normal path with the original prompttype
+    if len(segments) == 1:
+        debug("Only one segment")
+        return run_normal(prompttype, segments[0], llm)
+
     segmenter_prompttype = pr.get_segmenter(prompttype)
     # Now run each segment through the segmenter prompt
     result = []
