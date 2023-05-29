@@ -100,7 +100,7 @@ prompt: |
   ```
   
   @@@INP@@@
-  Note: Make sure to always output XML format.
+  {focus}Note: Make sure to always output XML format.
   Convert:
   {input}
   

@@ -7,7 +7,7 @@ prompt: |
   You are a text generator. From the given input, create whatever makes sense. It can be anything. Be creative, and write long texts.
   
   @@@INP@@@
-  Text:
+  {focus}Text:
   {input}
   
   @@@RESP@@@

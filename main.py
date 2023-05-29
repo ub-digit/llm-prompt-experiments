@@ -20,7 +20,8 @@ OPTIONS={
     "table": None,
     "list": None,
     "css": None,
-    "segment": None
+    "segment": None,
+    "focus": None,
 }
 OPTION_TYPES={
     "table": str,
@@ -28,6 +29,7 @@ OPTION_TYPES={
     "textonly": bool,
     "segment": int,
     "css": str,
+    "focus": str,
     "_default": str
 }
 
@@ -157,7 +159,7 @@ def run(prompttype, input, llm):
     else:
         return run_normal(prompttype, input, llm)
 
-def run_normal(prompttype, input, llm, print_result=True):
+def run_normal(prompttype, input, llm, print_result=True, add_focus=True):
     debug("\n---------  INPUT  ---------\n")
     debug(input)
     debug("\n-------- END INPUT --------\n")
@@ -165,7 +167,10 @@ def run_normal(prompttype, input, llm, print_result=True):
     prompt = PromptTemplate.from_template(prompttext)
     llmchain = LLMChain(prompt=prompt, llm=llm)
     debug("\n---------  RESULT  ---------\n")
-    result = llmchain.run({"input": input})
+    focus = ""
+    if OPTIONS["focus"] != None and add_focus:
+        focus = "Focus on: " + OPTIONS["focus"]
+    result = llmchain.run({"input": input, "focus": focus})
     result = result.strip()
     # Remove "###" from the end of the result if it's there
     if result.endswith("###"):
@@ -222,7 +227,7 @@ def run_segment(prompttype, input, llm):
     # Enumerate the segments so that we can print the segment number
     for i, segment in enumerate(segments):
         print("\n---------  SEGMENT " + str(i+1) + "/" + str(len(segments)) + " (" + str(len(segment)) + " bytes) ---------\n")
-        segment_result = run_normal(segmenter_prompttype, segment, llm, print_result=False)
+        segment_result = run_normal(segmenter_prompttype, segment, llm, print_result=False, add_focus = True)
         # If segment_result is too short, it means that the segmenter prompt probably wasn't useful, so append the full segment instead
         if len(segment_result) < len(segment)*0.1:
             debug("Segment result is too short: " + str(len(segment_result)) + " < " + str(len(segment)*0.1) + " characters")

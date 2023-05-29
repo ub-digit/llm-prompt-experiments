@@ -7,6 +7,7 @@ prompt: |
   The instruction for using the prompt. Any curly brackets must be escaped by double {{ like this }}
 
   @@@INP@@@
+  {focus} should be the first part of the Input section, allowing the addition of more specialized answers.
   The part where input goes along with some bits of separators or minor instructions.
   Input is inserted using {input}.
 

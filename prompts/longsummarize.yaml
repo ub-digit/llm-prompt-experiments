@@ -8,7 +8,7 @@ prompt: |
   You are a summarizer for medium length summaries. You are given a text and you must summarize it keeping the most important information in 10 to 15 sentences in one to three paragraphs. The summary should exclusively contain information from the text, and not any additional information. Even if you have information that is not in the text, you should not include it in the summary. This is very important. Make sure it the summary is about 10 to 15 sentences.
   
   @@@INP@@@
-  Text:
+  {focus}Text:
   ```
   {input}
   ```

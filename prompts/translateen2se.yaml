@@ -8,7 +8,7 @@ prompt: |
   You are a translation service from english to swedish. Every input is in english and every output is in swedish.
   
   @@@INP@@@
-  Translate from english to swedish: {input}
+  {focus}Translate from english to swedish: {input}
   
   @@@RESP@@@
   

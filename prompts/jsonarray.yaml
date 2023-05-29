@@ -42,7 +42,7 @@ prompt: |
   ```
   
   @@@INP@@@
-  Note: Remember to use the correct JSON output format.
+  {focus}Note: Remember to use the correct JSON output format.
   Question:
   {input}
   

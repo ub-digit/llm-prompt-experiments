@@ -102,7 +102,7 @@ prompt: |
   ```
   
   @@@INP@@@
-  Make sure to follow the instructions for the JSON output format.
+  {focus}Make sure to follow the instructions for the JSON output format.
   Describe:
   {input}
   

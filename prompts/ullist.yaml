@@ -34,7 +34,7 @@ prompt: |
   ```
   
   @@@INP@@@
-  Question: {input}
+  {focus}Question: {input}
   
   @@@RESP@@@
   
