@@ -15,12 +15,19 @@ dotenv.load_dotenv()
 MODEL_TYPE="wizard-vicuna"
 DEBUG=False
 PRINTRESULT=False
-OPTIONS={}
+OPTIONS={
+    "textonly": None,
+    "table": None,
+    "list": None,
+    "css": None,
+    "segment": None
+}
 OPTION_TYPES={
     "table": str,
     "list": str,
     "textonly": bool,
     "segment": int,
+    "css": str,
     "_default": str
 }
 
@@ -79,6 +86,27 @@ def fetch_list_from_url_data(soup):
                     input = str(list)
     return input
 
+# Fetch input from a URL and extract according to a CSS selector
+# The CSS selector can be specified with the option "css", which can be assumed to exist here.
+# IF the CSS selector is not specified, the input is the text content of the page
+def fetch_css_from_url_data(soup):
+    css = OPTIONS["css"]
+    input = soup.select(css)
+    # If there are more than one element matching the CSS selector,
+    # fetch the content into a list
+    list = []
+    for element in input:
+        if OPTIONS["textonly"] == True:
+            list.append(element.get_text("   ").strip())
+        else:
+            list.append(str(element))
+    if len(list) == 0:
+        # Return the text content of the page if the CSS selector is not found
+        return soup.get_text().strip()
+    # Concatenate the list into a string
+    input = "\n".join(list)
+    return input
+
 # Use requests and beautifulsoup to fetch the input from the text content of a URL
 def fetch_input_from_url(url):
     r = requests.get(url)
@@ -87,14 +115,16 @@ def fetch_input_from_url(url):
     # If the option "table" is True, get the text content of the largest table on the page
     # If the option "table" has a CSS selector, get the text content of the table that matches the CSS selector
     # If the option "table" is False or not set, get the text content of the page
-    if "table" in OPTIONS:
+    if "table" in OPTIONS and OPTIONS["table"] is not None:
         input = fetch_table_from_url_data(soup)
         if input is None:
             return soup.get_text().strip()
-    elif "list" in OPTIONS:
+    elif "list" in OPTIONS and OPTIONS["list"] is not None:
         input = fetch_list_from_url_data(soup)
         if input is None:
             return soup.get_text().strip()
+    elif "css" in OPTIONS and OPTIONS["css"] is not None:
+        input = fetch_css_from_url_data(soup)
     else:
         # Get the text content of the page
         input = soup.get_text().strip()
