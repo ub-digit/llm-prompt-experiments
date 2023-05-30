@@ -9,6 +9,7 @@ import requests
 import os
 import dotenv
 from bs4 import BeautifulSoup
+import PyPDF2
 
 dotenv.load_dotenv()
 
@@ -22,6 +23,7 @@ OPTIONS={
     "css": None,
     "segment": None,
     "focus": None,
+    "pages": None
 }
 OPTION_TYPES={
     "table": str,
@@ -30,6 +32,7 @@ OPTION_TYPES={
     "segment": int,
     "css": str,
     "focus": str,
+    "pages": str,
     "_default": str
 }
 
@@ -169,7 +172,7 @@ def run_normal(prompttype, input, llm, print_result=True, add_focus=True):
     debug("\n---------  RESULT  ---------\n")
     focus = ""
     if OPTIONS["focus"] != None and add_focus:
-        focus = "Focus on: " + OPTIONS["focus"]
+        focus = "Focus on: " + OPTIONS["focus"] + "\n"
     result = llmchain.run({"input": input, "focus": focus})
     result = result.strip()
     # Remove "###" from the end of the result if it's there
@@ -264,6 +267,29 @@ def searx_fetch_pages_content(searx_query):
     # Return as one large string
     return "\n".join(searx_pages_content)
 
+# Given a PDF file, load it and return the text content
+# The pages are concatenated together with a newline between each page
+# There is an OPTION "pages" which can be used to specify which pages to load
+# in the format "start:end" where start and end are integers and the first page is 1
+# If the option "pages" is not specified, all pages are loaded
+def load_pdf(filename):
+    pdfFileObj = open(filename, 'rb')
+    pdfReader = PyPDF2.PdfReader(pdfFileObj)
+    pages = []
+    if "pages" in OPTIONS and OPTIONS["pages"] is not None:
+        start, end = OPTIONS["pages"].split(":")
+        start = int(start)
+        end = int(end)
+        for i in range(start-1, end):
+            pageObj = pdfReader.pages[i]
+            pages.append(pageObj.extract_text())
+    else:
+        for i in range(len(pdfReader.pages)):
+            pageObj = pdfReader.pages[i]
+            pages.append(pageObj.extract_text())
+    pdfFileObj.close()
+    return "\n".join(pages)
+
 def main():
     global MODEL_TYPE
     global DEBUG
@@ -294,6 +320,8 @@ def main():
     parser.add_argument('-j', '--json', type=str, help='Output JSON', required=False)
     # -S query fetches input from top 3 search results from searx
     parser.add_argument('-S', '--searx', type=str, help='Fetch input from top 3 search results from searx', required=False)
+    # -P loads a PDF file as input
+    parser.add_argument('-P', '--pdf', type=str, help='Load PDF file as input', required=False)
     # fetch input from url with -u
     parser.add_argument('-u', '--url', type=str, help='Fetch input from URL (cannot be used together with inputfile)', required=False)
     # special options with -O and it should be repeated for each option
@@ -341,6 +369,8 @@ def main():
         input = fetch_input_from_url(args.url)
     elif args.searx != None:
         input = searx_fetch_pages_content(args.searx)
+    elif args.pdf != None:
+        input = load_pdf(args.pdf)
     else:
         input = " ".join(args.input)
 
@@ -377,6 +407,8 @@ def satisfies_file_requirements(args):
     if args.url:
         return True
     if args.searx:
+        return True
+    if args.pdf:
         return True
     return False
 
