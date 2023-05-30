@@ -237,6 +237,33 @@ def run_segment(prompttype, input, llm):
     # Now run the segment sum through the original run function
     return run(prompttype, segment_sum, llm)
 
+def searx_fetch_pages_content(searx_query):
+    # Fetch the search results from searx (URL in ENV)
+    searx_url = os.getenv("SEARX_BASE_URL", None)
+    if searx_url is None:
+        raise Exception("SEARX_BASE_URL is not set")
+    # URL encode query
+    searx_query = requests.utils.quote(searx_query)
+    searx_url += searx_query
+    # Fetch JSON from searx
+    r = requests.get(searx_url)
+    # Parse JSON
+    searx_json = json.loads(r.text)
+    # Get the list of results, the top 3 urls.
+    searx_results = searx_json["results"][:3]
+    # Fetch the content of each page
+    searx_pages_content = []
+    for result in searx_results:
+        debug("Fetching page "+result["title"]+": " + result["url"])
+        # Fetch the page
+        r = requests.get(result["url"])
+        # Parse the page
+        soup = BeautifulSoup(r.text, "html.parser")
+        # Get the text content of the page
+        searx_pages_content.append(soup.get_text().strip())
+    # Return as one large string
+    return "\n".join(searx_pages_content)
+
 def main():
     global MODEL_TYPE
     global DEBUG
@@ -265,6 +292,8 @@ def main():
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose', required=False)
     # output JSON using -j
     parser.add_argument('-j', '--json', type=str, help='Output JSON', required=False)
+    # -S query fetches input from top 3 search results from searx
+    parser.add_argument('-S', '--searx', type=str, help='Fetch input from top 3 search results from searx', required=False)
     # fetch input from url with -u
     parser.add_argument('-u', '--url', type=str, help='Fetch input from URL (cannot be used together with inputfile)', required=False)
     # special options with -O and it should be repeated for each option
@@ -310,6 +339,8 @@ def main():
             input = f.read()
     elif args.url != None:
         input = fetch_input_from_url(args.url)
+    elif args.searx != None:
+        input = searx_fetch_pages_content(args.searx)
     else:
         input = " ".join(args.input)
 
@@ -317,8 +348,8 @@ def main():
     if outputfile == None and outputjson == None:
         PRINTRESULT = True
 
-    if pr.requires_file_input(prompttype) and args.inputfile == None and args.url == None:
-        parser.error("Prompt type {} requires an input file or url".format(prompttype))
+    if pr.requires_file_input(prompttype) and satisfies_file_requirements(args) == False:
+        parser.error("Prompt type {} requires an input file, url or search results".format(prompttype))
 
     # If prompttype does not have a JSON result, outputjson is invalid
     if not pr.has_json_result(prompttype) and outputjson:
@@ -339,6 +370,15 @@ def main():
         else:
             with open(outputjson, "w") as f:
                 json.dump(jsonresult[0], f, indent=4)
+
+def satisfies_file_requirements(args):
+    if args.inputfile:
+        return True
+    if args.url:
+        return True
+    if args.searx:
+        return True
+    return False
 
 def init():
     pr.load_all_prompts_from_yaml()
