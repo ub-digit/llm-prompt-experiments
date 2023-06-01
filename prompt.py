@@ -14,7 +14,7 @@ STYLES={
         "@@@RESP@@@": "### Assistant:"
     },
     "wizard-vicuna": {
-        "@@@INSTR@@@": "USER:",
+        "@@@INSTR@@@": "",
         "@@@INP@@@": "USER:",
         "@@@RESP@@@": "ASSISTANT:"
     }

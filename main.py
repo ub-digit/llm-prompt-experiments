@@ -1,5 +1,5 @@
 import sys
-from langchain.llms import TextGenerationWebui, OpenAI
+from langchain.llms import OpenAI
 import prompt as pr
 from langchain import PromptTemplate, LLMChain
 from flexible_json_parser import find_all_json
@@ -157,7 +157,7 @@ def parse_options(options):
 
 def run(prompttype, input, llm):
     # If the option "segment" is set, run the input through the segmenter path instead of the normal path
-    if "segment" in OPTIONS and pr.has_segmenter(prompttype):
+    if OPTIONS["segment"] != None and pr.has_segmenter(prompttype):
         return run_segment(prompttype, input, llm)
     else:
         return run_normal(prompttype, input, llm)
