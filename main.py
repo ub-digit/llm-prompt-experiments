@@ -23,7 +23,8 @@ OPTIONS={
     "css": None,
     "segment": None,
     "focus": None,
-    "pages": None
+    "pages": None,
+    "alt_prompt_dir": None,
 }
 OPTION_TYPES={
     "table": str,
@@ -33,6 +34,7 @@ OPTION_TYPES={
     "css": str,
     "focus": str,
     "pages": str,
+    "alt_prompt_dir": str,
     "_default": str
 }
 
@@ -331,6 +333,14 @@ def main():
 
     args = parser.parse_args()
 
+    if args.option != None:
+        parse_options(args.option)
+    
+    # If option "alt_prompt_dir" is set, load the prompt from that directory
+    # as well as the default prompt directory
+    if "alt_prompt_dir" in OPTIONS and OPTIONS["alt_prompt_dir"] is not None:
+        pr.load_all_prompts_from_yaml(OPTIONS["alt_prompt_dir"])
+
     # You cannot have both an input file and an input url
     if args.inputfile != None and args.url != None:
         parser.error("You cannot have both an input file and an input URL")
@@ -358,8 +368,6 @@ def main():
         outputfile = args.outputfile
     if args.verbose != None:
         DEBUG = args.verbose
-    if args.option != None:
-        parse_options(args.option)
     if args.json != None:
         outputjson = args.json
     if args.inputfile != None:

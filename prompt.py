@@ -40,11 +40,11 @@ def convert_all_prompts_to_yaml():
             f.write(prompt_yaml)
 
 # Load all prompts from yaml files in prompts/ and store them in PROMPTS
-def load_all_prompts_from_yaml():
+def load_all_prompts_from_yaml(dir = "prompts"):
     global PROMPTS
-    for filename in os.listdir("prompts"):
+    for filename in os.listdir(dir):
         if filename.endswith(".yaml"):
-            with open("prompts/" + filename, "r") as f:
+            with open(dir + "/" + filename, "r") as f:
                 prompt_dict = yaml.safe_load(f)
                 prompt = prompt_dict["name"]
                 PROMPTS[prompt] = prompt_dict
