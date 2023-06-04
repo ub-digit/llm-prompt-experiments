@@ -22,6 +22,26 @@ STYLES={
 
 PROMPTS={}
 
+# Automatically set the style based on the model name
+def set_style_from_model(model):
+    # If model name starts with "gpt4-x-vicuna" use "alpaca"
+    if model.startswith("gpt4-x-vicuna"):
+        set_style("alpaca")
+    # If model name starts with "gpt4-x-alpaca" use "alpaca"
+    elif model.startswith("gpt4-x-alpaca"):
+        set_style("alpaca")
+    # If model name starts with "Wizard-Vicuna" use "wizard-vicuna"
+    elif model.startswith("Wizard-Vicuna"):
+        set_style("wizard-vicuna")
+    # If model name starts with "vicuna" use "vicuna"
+    elif model.startswith("vicuna"):
+        set_style("vicuna")
+    # If model name starts with "guanaco" use "alpaca"
+    elif model.startswith("guanaco"):
+        set_style("alpaca")
+    else:
+        set_style("alpaca")
+
 # Convert prompts to yaml with properties name, description, has_json_result, requires_file, and prompt.
 # Prompt should be last so that it can be a multiline string.
 # Prompts should be saved in prompts/ with the name of the prompt as the filename.

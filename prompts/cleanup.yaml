@@ -8,7 +8,7 @@ prompt: |
   You are a text cleanup service. The input is text that can have unusual sentences, line breaks and punctuation. You will output a result with the same content, except with the unusual and broken parts repaired. Make the output a coherent text.
   
   @@@INP@@@
-  Text:
+  {focus}Text:
   ```
   {input}
   ```

@@ -13,7 +13,7 @@ import PyPDF2
 
 dotenv.load_dotenv()
 
-MODEL_TYPE="wizard-vicuna"
+MODEL_TYPE=None
 DEBUG=False
 PRINTRESULT=False
 OPTIONS={
@@ -24,6 +24,7 @@ OPTIONS={
     "segment": None,
     "focus": None,
     "pages": None,
+    "segmenter": None,
     "alt_prompt_dir": None,
 }
 OPTION_TYPES={
@@ -34,6 +35,7 @@ OPTION_TYPES={
     "css": str,
     "focus": str,
     "pages": str,
+    "segmenter": str,
     "alt_prompt_dir": str,
     "_default": str
 }
@@ -227,6 +229,9 @@ def run_segment(prompttype, input, llm):
         return run_normal(prompttype, segments[0], llm)
 
     segmenter_prompttype = pr.get_segmenter(prompttype)
+    # If there is an option "segmenter", use that as the segmenter prompttype instead
+    if "segmenter" in OPTIONS and OPTIONS["segmenter"] is not None:
+        segmenter_prompttype = OPTIONS["segmenter"]
     # Now run each segment through the segmenter prompt
     result = []
     # Enumerate the segments so that we can print the segment number
@@ -292,6 +297,32 @@ def load_pdf(filename):
     pdfFileObj.close()
     return "\n".join(pages)
 
+def test(llm):
+    result = llm.client
+    print(result)
+    # Exit
+    sys.exit(0)
+
+# Find model name with a simple request directly to the API
+# We send a request to the API with a very short prompt and max_tokens=0
+# The model name is in the response in the field "model"
+def find_model_name(openai_api_base, openai_api_key):
+    json_body = {
+        "prompt": "probe",
+        "max_tokens": 0,
+    }
+    url = openai_api_base + "/completions"
+    # Post the request to the API
+    resp = requests.post(url, json=json_body)
+    # Parse the response
+    result = json.loads(resp.text)
+    # Return the model name if it exists
+    if "model" in result:
+        print("Model name: " + result["model"])
+        return result["model"]
+    # If the model name does not exist, raise an exception
+    raise Exception("Could not find model name")
+
 def main():
     global MODEL_TYPE
     global DEBUG
@@ -305,6 +336,7 @@ def main():
     input = None
     openai_api_base = os.getenv("OPENAI_API_BASE", "http://localhost:5001/")
     openai_api_key = os.getenv("OPENAI_API_KEY", "change-me-if-necessary")
+    model_name = find_model_name(openai_api_base, openai_api_key)
     llm = OpenAI(openai_api_base=openai_api_base, openai_api_key=openai_api_key, temperature=0.2, max_tokens=1000)
 
     parser = argparse.ArgumentParser(description='Run a prompt')
@@ -393,7 +425,10 @@ def main():
     if not pr.has_json_result(prompttype) and outputjson:
         parser.error("Prompt type {} does not have a JSON result".format(prompttype))
 
-    pr.set_style(MODEL_TYPE)
+    if MODEL_TYPE != None:
+        pr.set_style(MODEL_TYPE)
+    else:
+        pr.set_style_from_model(model_name)
 
     result = run(prompttype, input, llm)
     # If outputfile is specified, write result to file
