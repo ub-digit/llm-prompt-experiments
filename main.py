@@ -25,6 +25,7 @@ OPTIONS={
     "focus": None,
     "pages": None,
     "segmenter": None,
+    "max_tokens": None,
     "alt_prompt_dir": None,
 }
 OPTION_TYPES={
@@ -36,6 +37,7 @@ OPTION_TYPES={
     "focus": str,
     "pages": str,
     "segmenter": str,
+    "max_tokens": int,
     "alt_prompt_dir": str,
     "_default": str
 }
@@ -323,6 +325,19 @@ def find_model_name(openai_api_base, openai_api_key):
     # If the model name does not exist, raise an exception
     raise Exception("Could not find model name")
 
+def set_model(model_name):
+    modelswap_base_url = os.getenv("MODELSWAP_BASE_URL", "http://localhost:5301/")
+    json_body = {
+        "model": model_name,
+    }
+    url = modelswap_base_url + "/v1/model"
+    print("Setting model to " + model_name)
+    # Post the request to the API
+    try:
+        requests.post(url, json=json_body)
+    except:
+        print("Could not set model, using default")
+
 def main():
     global MODEL_TYPE
     global DEBUG
@@ -336,8 +351,6 @@ def main():
     input = None
     openai_api_base = os.getenv("OPENAI_API_BASE", "http://localhost:5001/")
     openai_api_key = os.getenv("OPENAI_API_KEY", "change-me-if-necessary")
-    model_name = find_model_name(openai_api_base, openai_api_key)
-    llm = OpenAI(openai_api_base=openai_api_base, openai_api_key=openai_api_key, temperature=0.2, max_tokens=1000)
 
     parser = argparse.ArgumentParser(description='Run a prompt')
     # prompttype from -p
@@ -348,6 +361,8 @@ def main():
     parser.add_argument('-o', '--outputfile', type=str, help='Output file', required=False)
     # model type from -m
     parser.add_argument('-m', '--modeltype', type=str, help='Model type (use LIST to see available modeltypes)', required=False)
+    # Force model with -M
+    parser.add_argument('-M', '--model', type=str, help='Force model', required=False)
     # verbose from -v
     parser.add_argument('-v', '--verbose', action='store_true', help='Verbose', required=False)
     # output JSON using -j
@@ -392,6 +407,17 @@ def main():
             print(modeltype)
         sys.exit(0)
 
+    # If option "max_tokens" is set, set the max_tokens parameter of the LLM
+    # otherwise, use the default value of 1000
+    max_tokens = 1000
+    if "max_tokens" in OPTIONS and OPTIONS["max_tokens"] is not None:
+        max_tokens = OPTIONS["max_tokens"]
+
+    llm = OpenAI(openai_api_base=openai_api_base, openai_api_key=openai_api_key, temperature=0.2, max_tokens=max_tokens)
+
+    if args.model != None:
+        model_name = args.model
+        set_model(model_name)
     if args.modeltype != None:
         MODEL_TYPE = args.modeltype
     if args.prompttype != None:
@@ -413,6 +439,8 @@ def main():
         input = load_pdf(args.pdf)
     else:
         input = " ".join(args.input)
+
+    model_name = find_model_name(openai_api_base, openai_api_key)
 
     # If no outputfile or outputjson is specified, print result
     if outputfile == None and outputjson == None:

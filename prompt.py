@@ -39,6 +39,8 @@ def set_style_from_model(model):
     # If model name starts with "guanaco" use "alpaca"
     elif model.startswith("guanaco"):
         set_style("alpaca")
+    elif model.startswith("airoboros"):
+        set_style("wizard-vicuna")
     else:
         set_style("alpaca")
 
