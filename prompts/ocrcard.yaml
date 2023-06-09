@@ -102,6 +102,24 @@ prompt: |
   ```
   
   @@@INP@@@
+  Make sure to follow the instructions for the JSON output format.
+  Describe:
+  Zoist.
+  auiu..
+  Avhandlinger_
+  fra universitetets historiske seminar utgit
+  av Halvdan Koht . ..
+  B. 1-11.	8:o Kristiania 1914-
+  56.
+  Forts, se Katalog 1958-; Avhandlinger utg. av
+  Universitetets historiske seminar.
+
+  @@@RESP@@@
+  ```
+  {{ "author": "", "title": "Avhandlinger fra universitetets historiske seminar utgit av Halvdan Koht", "year": "1914", "location": "Kristiania" }}
+  ```
+
+  @@@INP@@@
   {focus}Make sure to follow the instructions for the JSON output format.
   Describe:
   {input}
